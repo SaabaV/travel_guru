@@ -1,0 +1,27 @@
+<!-- templates/reviews/review_list.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reviews for {{ listing.title }}{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+    <h1>Reviews for {{ listing.title }}</h1>
+    <div class="reviews-list">
+        {% if reviews %}
+            {% for review in reviews %}
+                <div class="review">
+                    <p><strong>{{ review.user.username }}</strong> rated <strong>{{ review.rating }}</strong></p>
+                    <p>{{ review.comment }}</p>
+                    <p><em>{{ review.created_at }}</em></p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No reviews yet.</p>
+        {% endif %}
+    </div>
+    <button class="back-button" onclick="window.location.href='{% url 'listing_detail' listing.pk %}'">Back to Listing</button>
+{% endblock %}
+

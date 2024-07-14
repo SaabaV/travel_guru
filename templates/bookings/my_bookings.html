@@ -1,0 +1,53 @@
+<!-- templates/bookings/my_bookings.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/listing.css' %}">
+    <link rel="stylesheet" href="{% static 'css/my_bookings.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1>My Bookings</h1>
+    <div class="booking-list">
+        {% for booking in bookings %}
+            <div class="booking">
+                {% if booking.listing.images.all %}
+                    <img src="{{ booking.listing.images.all.0.image.url }}" alt="{{ booking.listing.title }}">
+                {% else %}
+                    <img src="{% static 'images/no_image_available.png' %}" alt="No image available">
+                {% endif %}
+                <h2>{{ booking.listing.title }}</h2>
+                <p><strong>Location:</strong> {{ booking.listing.location }}</p>
+                <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
+                <p><strong>End Date:</strong> {{ booking.end_date }}</p>
+                <p><strong>Price:</strong> ${{ booking.price }}</p>
+                <p><strong>Status:</strong> 
+                    {% if booking.status == 'pending' %}
+                        <span class="status-pending">{{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'confirmed' %}
+                        <span class="status-confirmed">{{ booking.get_status_display }}</span>
+                        <a href="{% url 'start_payment' booking.id %}" class="pay-button">Pay Now</a>
+                    {% elif booking.status == 'declined' %}
+                        <span class="status-declined">{{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'completed' %}
+                        <span class="status-completed">{{ booking.get_status_display }}</span>
+                    {% else %}
+                        {{ booking.get_status_display }}
+                    {% endif %}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+    <button class="back-button" onclick="window.location.href='{% url 'home' %}'">Back to Listings</button>
+{% endblock %}
+
+
+
+
+
+
+
+

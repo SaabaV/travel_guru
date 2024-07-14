@@ -1,0 +1,157 @@
+<!-- templates/bookings/manage_bookings.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Bookings{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/manage_bookings.css' %}">
+    <style>
+        .booking-list, .listing-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .booking, .listing {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+            position: relative;
+        }
+
+        .booking img, .listing img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .booking h2, .listing h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            margin-top: 15px;
+        }
+
+        .booking p, .listing p {
+            margin: 5px 0;
+        }
+
+        .booking strong, .listing strong {
+            display: inline-block;
+            width: 100px;
+        }
+
+        .status-pending {
+            color: #FFA500; /* Желтый цвет */
+            font-weight: bold;
+        }
+
+        .status-confirmed {
+            color: #4CAF50; /* Зеленый цвет */
+            font-weight: bold;
+        }
+
+        .status-declined {
+            color: #FF0000; /* Красный цвет */
+            font-weight: bold;
+        }
+
+        .status-completed {
+            color: #0000FF; /* Синий цвет */
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .action-buttons a {
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .action-buttons .confirm {
+            background-color: #4CAF50;
+        }
+
+        .action-buttons .decline {
+            background-color: #FF0000;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h1>Manage Bookings</h1>
+    <h2>Your Listings</h2>
+    <div class="listing-list">
+        {% for listing in listings %}
+            <div class="listing">
+                {% if listing.images.all %}
+                    <img src="{{ listing.images.all.0.image.url }}" alt="{{ listing.title }}">
+                {% else %}
+                    <img src="{% static 'images/no_image_available.png' %}" alt="No image available">
+                {% endif %}
+                <h2>{{ listing.title }}</h2>
+                <p><strong>Location:</strong> {{ listing.location }}</p>
+                <p><strong>Price:</strong> ${{ listing.price }}</p>
+                <p><strong>Rooms:</strong> {{ listing.rooms }}</p>
+                <p><strong>Type:</strong> {{ listing.property_type }}</p>
+                <p><strong>Status:</strong> {{ listing.is_active|yesno:"Active,Inactive" }}</p>
+                <div class="action-buttons">
+                    <a href="{% url 'edit_listing' listing.pk %}" class="confirm">Edit</a>
+                    <a href="{% url 'delete_listing' listing.pk %}" class="decline">Delete</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>Bookings</h2>
+    <div class="booking-list">
+        {% for booking in bookings %}
+            <div class="booking">
+                {% if booking.listing.images.all %}
+                    <img src="{{ booking.listing.images.all.0.image.url }}" alt="{{ booking.listing.title }}">
+                {% else %}
+                    <img src="{% static 'images/no_image_available.png' %}" alt="No image available">
+                {% endif %}
+                <h2>{{ booking.listing.title }}</h2>
+                <p><strong>Location:</strong> {{ booking.listing.location }}</p>
+                <p><strong>User:</strong> {{ booking.user.name }}</p>
+                <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
+                <p><strong>End Date:</strong> {{ booking.end_date }}</p>
+                <p><strong>Price:</strong> ${{ booking.price }}</p>
+                <p><strong>Status:</strong> 
+                    {% if booking.status == 'pending' %}
+                        <span class="status-pending">{{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'confirmed' %}
+                        <span class="status-confirmed">{{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'declined' %}
+                        <span class="status-declined">{{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'completed' %}
+                        <span class="status-completed">{{ booking.get_status_display }}</span>
+                    {% else %}
+                        {{ booking.get_status_display }}
+                    {% endif %}
+                </p>
+                <div class="action-buttons">
+                    <a href="{% url 'update_booking_status' booking.id 'confirmed' %}" class="confirm">Confirm</a>
+                    <a href="{% url 'update_booking_status' booking.id 'declined' %}" class="decline">Decline</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+
+
+

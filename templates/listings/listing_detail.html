@@ -1,0 +1,157 @@
+<!-- templates/listings/listing_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ listing.title }}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/listing_add.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>{{ listing.title }}</h1>
+        <div class="details">
+            {% for image in listing.images.all %}
+                <img src="{{ image.image.url }}" alt="{{ listing.title }}">
+            {% endfor %}
+            <p>{{ listing.description }}</p>
+            <p><strong>Location:</strong> {{ listing.location }}</p>
+            <p><strong>Price:</strong> ${{ listing.price }}</p>
+            <p><strong>Rooms:</strong> {{ listing.rooms }}</p>
+            <p><strong>Type:</strong> {{ listing.property_type }}</p>
+            <p><strong>Owner:</strong> {{ listing.owner.name }}</p>
+            <p><strong>Created at:</strong> {{ listing.created_at }}</p>
+            <p><strong>Updated at:</strong> {{ listing.updated_at }}</p>
+            <p>Rating: {{ avg_rating }}</p>
+        </div>
+        <div class="booking-form">
+            <h2>Book This Listing</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div>
+                    <label for="start_date">Start date:</label>
+                    {{ form.start_date.errors }}
+                    {{ form.start_date }}
+                </div>
+                <div>
+                    <label for="end_date">End date:</label>
+                    {{ form.end_date.errors }}
+                    {{ form.end_date }}
+                </div>
+                <button type="submit">Book Now</button>
+            </form>
+        </div>
+        <div class="buttons">
+            <button onclick="window.location.href='{% url 'home' %}'">Back to Listings</button>
+            {% if user.is_authenticated and user == listing.owner %}
+                <button onclick="window.location.href='{% url 'edit_listing' listing.pk %}'">Edit</button>
+                <button onclick="window.location.href='{% url 'delete_listing' listing.pk %}'">Delete</button>
+            {% endif %}
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-section">
+            <h2>Reviews</h2>
+            {% for review in reviews %}
+                <div class="review">
+                    <p><strong>{{ review.user.username }}</strong> rated <strong>{{ review.rating }}</strong></p>
+                    <p>{{ review.comment }}</p>
+                </div>
+            {% endfor %}
+            <a href="{% url 'review_list' listing.pk %}">View all reviews</a>
+        </div>
+
+        <!-- Add Review Form -->
+        {% if user_can_review %}
+        <div class="add-review-form">
+            <h2>Add a Review</h2>
+            <form method="post" action="{% url 'add_review' listing.pk %}">
+                {% csrf_token %}
+                {{ review_form.non_field_errors }}
+                <div>
+                    <label for="rating">Rating:</label>
+                    {{ review_form.rating.errors }}
+                    {{ review_form.rating }}
+                </div>
+                <div>
+                    <label for="comment">Comment:</label>
+                    {{ review_form.comment.errors }}
+                    {{ review_form.comment }}
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        const unavailableDates = {{ unavailable_dates|safe }};
+        flatpickr(".datepicker", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: unavailableDates,
+        });
+
+        const toast = document.querySelector(".toast"),
+              closeIcon = document.querySelector(".close"),
+              progress = document.querySelector(".progress");
+
+        let timer1, timer2;
+
+        {% if messages %}
+            {% for message in messages %}
+                if ("{{ message.tags }}" === "success") {
+                    toast.style.display = 'block';
+                    toast.classList.add("active");
+                    progress.classList.add("active");
+
+                    timer1 = setTimeout(() => {
+                        toast.classList.remove("active");
+                    }, 5000); //1s = 1000 milliseconds
+
+                    timer2 = setTimeout(() => {
+                        progress.classList.remove("active");
+                    }, 5300);
+                }
+            {% endfor %}
+        {% endif %}
+
+        closeIcon.addEventListener("click", () => {
+            toast.classList.remove("active");
+
+            setTimeout(() => {
+                progress.classList.remove("active");
+            }, 300);
+
+            clearTimeout(timer1);
+            clearTimeout(timer2);
+        });
+    </script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

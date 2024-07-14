@@ -1,0 +1,39 @@
+<!-- templates/bookings/create_booking.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book {{ listing.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/listing.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap_datepicker_plus/css/datepicker-widget.css' %}">
+</head>
+<body>
+    <h1>Book {{ listing.title }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Book Now</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'bootstrap_datepicker_plus/js/datepicker-widget.js' %}"></script>
+    <script>
+        $(function () {
+            var unavailableDates = {{ unavailable_dates|safe }};
+            $('#id_start_date, #id_end_date').datepicker({
+                format: 'yyyy-mm-dd',
+                beforeShowDay: function (date) {
+                    var formattedDate = date.toISOString().split('T')[0];
+                    if (unavailableDates.includes(formattedDate)) {
+                        return false;
+                    }
+                    return true;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+

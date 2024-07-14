@@ -1,0 +1,19 @@
+<!-- templates/auth_user/login.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Login - Travel Guru{% endblock %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <h1>Login</h1>
+    <label for="id_username" onclick="expand(this)">Email</label>
+    <input type="text" id="id_username" name="username" placeholder="Enter your email">
+
+    <label for="id_password" onclick="expand(this)">Password</label>
+    <input type="password" id="id_password" name="password" placeholder="Enter your password">
+    
+    <button type="submit">Login</button>
+    <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+</form>
+{% endblock %}

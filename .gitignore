@@ -1,0 +1,22 @@
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Django static files
+static/
+media/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django migrations
+**/migrations/*
+!**/migrations/__init__.py
+
+# Media files
+templates/media/

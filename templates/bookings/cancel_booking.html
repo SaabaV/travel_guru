@@ -1,0 +1,14 @@
+<!-- templates/bookings/cancel_booking.html -->
+{% extends 'base.html' %}
+
+{% block title %}Cancel Booking{% endblock %}
+
+{% block content %}
+    <h1>Cancel Booking for {{ booking.listing.title }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to cancel this booking?</p>
+        <button type="submit">Yes, Cancel</button>
+    </form>
+{% endblock %}
+
