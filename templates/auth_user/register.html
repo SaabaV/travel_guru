@@ -1,28 +1,86 @@
-<!-- templates/auth_user/register.html -->
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Register - Travel Guru{% endblock %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 {% block content %}
-<form method="post">
+<form method="post" id="registerForm">
     {% csrf_token %}
     <h1>Register</h1>
 
-    <label for="id_email">Email</label>
-    <input type="text" id="id_email" name="email" placeholder="Enter your email">
+    <div class="form-group">
+        <label for="id_email">Email</label>
+        <input type="text" id="id_email" name="email" placeholder="Enter your email" required>
+    </div>
 
-    <label for="id_name">Name</label>
-    <input type="text" id="id_name" name="name" placeholder="Enter your name">
+    <div class="form-group">
+        <label for="id_name">Name</label>
+        <input type="text" id="id_name" name="name" placeholder="Enter your name" required>
+    </div>
 
-    <label for="id_password1">Password</label>
-    <input type="password" id="id_password1" name="password1" placeholder="Enter your password">
+    <div class="form-group">
+        <label for="id_password1">Password</label>
+        <input type="password" id="id_password1" name="password1" placeholder="Enter your password" required>
+    </div>
 
-    <label for="id_password2">Confirm Password</label>
-    <input type="password" id="id_password2" name="password2" placeholder="Confirm your password">
+    <div class="form-group">
+        <label for="id_password2">Confirm Password</label>
+        <input type="password" id="id_password2" name="password2" placeholder="Confirm your password" required>
+    </div>
 
     <button type="submit">Register</button>
     <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
 </form>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        let valid = true;
+        const email = document.getElementById('id_email');
+        const name = document.getElementById('id_name');
+        const password1 = document.getElementById('id_password1');
+        const password2 = document.getElementById('id_password2');
+
+        if (email.value.trim() === '') {
+            valid = false;
+            document.getElementById('email-error').style.display = 'block';
+            email.classList.add('error');
+        } else {
+            document.getElementById('email-error').style.display = 'none';
+            email.classList.remove('error');
+        }
+
+        if (name.value.trim() === '') {
+            valid = false;
+            document.getElementById('name-error').style.display = 'block';
+            name.classList.add('error');
+        } else {
+            document.getElementById('name-error').style.display = 'none';
+            name.classList.remove('error');
+        }
+
+        if (password1.value.trim() === '') {
+            valid = false;
+            document.getElementById('password1-error').style.display = 'block';
+            password1.classList.add('error');
+        } else {
+            document.getElementById('password1-error').style.display = 'none';
+            password1.classList.remove('error');
+        }
+
+        if (password2.value.trim() === '') {
+            valid = false;
+            document.getElementById('password2-error').style.display = 'block';
+            password2.classList.add('error');
+        } else {
+            document.getElementById('password2-error').style.display = 'none';
+            password2.classList.remove('error');
+        }
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>
 {% endblock %}
+
 
 

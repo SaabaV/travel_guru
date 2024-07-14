@@ -6,7 +6,6 @@ venv/
 .env
 
 # Django static files
-static/
 media/
 
 # Byte-compiled / optimized / DLL files

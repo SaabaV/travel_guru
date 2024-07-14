@@ -1,19 +1,52 @@
-<!-- templates/auth_user/login.html -->
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Login - Travel Guru{% endblock %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 {% block content %}
-<form method="post">
+<form method="post" id="loginForm">
     {% csrf_token %}
     <h1>Login</h1>
-    <label for="id_username" onclick="expand(this)">Email</label>
-    <input type="text" id="id_username" name="username" placeholder="Enter your email">
+    <div class="form-group">
+        <label for="id_username">Email</label>
+        <input type="text" id="id_username" name="username" placeholder="Enter your email" required>
+    </div>
+    <div class="form-group">
+        <label for="id_password">Password</label>
+        <input type="password" id="id_password" name="password" placeholder="Enter your password" required>
+    </div>
 
-    <label for="id_password" onclick="expand(this)">Password</label>
-    <input type="password" id="id_password" name="password" placeholder="Enter your password">
-    
     <button type="submit">Login</button>
     <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
 </form>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        let valid = true;
+        const username = document.getElementById('id_username');
+        const password = document.getElementById('id_password');
+
+        if (username.value.trim() === '') {
+            valid = false;
+            document.getElementById('username-error').style.display = 'block';
+            username.classList.add('error');
+        } else {
+            document.getElementById('username-error').style.display = 'none';
+            username.classList.remove('error');
+        }
+
+        if (password.value.trim() === '') {
+            valid = false;
+            document.getElementById('password-error').style.display = 'block';
+            password.classList.add('error');
+        } else {
+            document.getElementById('password-error').style.display = 'none';
+            password.classList.remove('error');
+        }
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>
 {% endblock %}
+
