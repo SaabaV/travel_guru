@@ -1,0 +1,76 @@
+        .booking-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .booking {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+            position: relative;
+        }
+
+        .booking img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .booking h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            margin-top: 15px;
+        }
+
+        .booking p {
+            margin: 5px 0;
+        }
+
+        .booking strong {
+            display: inline-block;
+            width: 100px;
+        }
+
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+
+        .status-pending {
+            color: #FFA500; /* Желтый цвет */
+            font-weight: bold;
+        }
+
+        .status-confirmed {
+            color: #4CAF50; /* Зеленый цвет */
+            font-weight: bold;
+        }
+
+        .status-declined {
+            color: #FF0000; /* Красный цвет */
+            font-weight: bold;
+        }
+
+        .status-completed {
+            color: #0000FF; /* Синий цвет */
+            font-weight: bold;
+        }

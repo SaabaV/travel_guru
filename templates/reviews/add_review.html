@@ -1,28 +1,27 @@
-<!-- templates/reviews/add_review.html -->
 {% extends 'base.html' %}
 {% load static %}
-
 {% block title %}Add Review{% endblock %}
 
-{% block extra_head %}
+{% block content %}
+    <div class="container">
+        <h1>Add a Review for {{ listing.title }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div>
+                <label for="rating">Rating:</label>
+                {{ form.rating.errors }}
+                {{ form.rating }}
+            </div>
+            <div>
+                <label for="comment">Comment:</label>
+                {{ form.comment.errors }}
+                {{ form.comment }}
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <button onclick="window.location.href='{% url 'listing_detail' listing.pk %}'">Back to Listing</button>
+    </div>
 {% endblock %}
 
-{% block content %}
-    <h1>Add Review for {{ listing.title }}</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        <div>
-            <label for="rating">Rating:</label>
-            {{ form.rating.errors }}
-            {{ form.rating }}
-        </div>
-        <div>
-            <label for="comment">Comment:</label>
-            {{ form.comment.errors }}
-            {{ form.comment }}
-        </div>
-        <button type="submit" class="button">Submit</button>
-    </form>
-{% endblock %}
 

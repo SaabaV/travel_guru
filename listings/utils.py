@@ -69,3 +69,14 @@ def get_listing_context(request, pk):
         'user_can_review': user_can_review,
     }
     return context
+
+
+def get_unavailable_dates(listing):
+    bookings = Booking.objects.filter(listing=listing, status='confirmed')
+    dates = []
+    for booking in bookings:
+        current_date = booking.start_date
+        while current_date <= booking.end_date:
+            dates.append(current_date.strftime('%Y-%m-%d'))
+            current_date += timedelta(days=1)
+    return dates
