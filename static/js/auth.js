@@ -4,3 +4,4 @@ function expand(lbl) {
   document.getElementById(elemId).classList.add("my-style");
   lbl.style.transform = "translateY(-45px)";
 }
+
