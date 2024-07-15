@@ -44,6 +44,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'templates/media')
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+LOGIN_URL = 'login'
+
 AUTH_USER_MODEL = 'auth_user.CustomUser'
 # Application definition
 

@@ -25,11 +25,16 @@ class Listing(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     average_rating = models.FloatField(default=0, blank=True)
+    reviews_count = models.IntegerField(default=0)
 
     def update_avg_rating(self):
         reviews = self.reviews.filter(approved=True)
         avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
         self.average_rating = avg_rating
+        self.save()
+
+    def update_reviews_count(self):
+        self.reviews_count = self.reviews.count()
         self.save()
 
     def __str__(self):

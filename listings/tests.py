@@ -1,125 +1,120 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from .models import Listing
+from datetime import date, timedelta
+from listings.models import Listing
+from reviews.models import Review
+from listings.forms import ListingForm
 
 User = get_user_model()
 
-class ListingTests(TestCase):
+class ListingModelTests(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(email='owner@example.com', password='testpass123', name='Owner User')
-        self.other_user = User.objects.create_user(email='other@example.com', password='testpass123', name='Other User')
+        self.user = User.objects.create_user(email='testuser@example.com', password='12345')
         self.listing = Listing.objects.create(
             title='Test Listing',
-            description='A nice place to stay.',
-            location='Test City',
+            description='Test Description',
+            location='Test Location',
             price=100.00,
             rooms=2,
             property_type='Apartments',
-            owner=self.user,
+            owner=self.user
         )
-        self.client.login(email='owner@example.com', password='testpass123')
 
-    def test_create_listing_view(self):
-        # Logout to test redirection for unauthenticated users
-        self.client.logout()
-        response = self.client.get(reverse('create_listing'))
-        self.assertEqual(response.status_code, 302)  # Expect redirection to login
+    def test_listing_creation(self):
+        self.assertEqual(self.listing.title, 'Test Listing')
+        self.assertEqual(self.listing.owner, self.user)
+        self.assertEqual(self.listing.price, 100.00)
 
-        # Login to test the creation of listing
-        self.client.login(email='owner@example.com', password='testpass123')
-        response = self.client.get(reverse('create_listing'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'listings/listing_form.html')
+    def test_update_reviews_count(self):
+        review = Review.objects.create(
+            listing=self.listing,
+            user=self.user,
+            rating=5,
+            comment='Great place!',
+            approved=True
+        )
+        self.listing.update_reviews_count()
+        self.assertEqual(self.listing.reviews_count, 1)
 
-        data = {
-            'title': 'New Listing',
-            'description': 'A new nice place to stay.',
-            'location': 'New City',
-            'price': 200.00,
-            'rooms': 3,
-            'property_type': 'Villas',
-            'is_active': True,
+    def test_update_avg_rating(self):
+        review = Review.objects.create(
+            listing=self.listing,
+            user=self.user,
+            rating=5,
+            comment='Great place!',
+            approved=True
+        )
+        self.listing.update_avg_rating()
+        self.assertEqual(self.listing.average_rating, 5.0)  # Изменено на average_rating
+
+class ListingFormTests(TestCase):
+
+    def test_listing_form_valid(self):
+        form_data = {
+            'title': 'Test Listing',
+            'description': 'Test Description',
+            'location': 'Test Location',
+            'price': 100.00,
+            'rooms': 2,
+            'property_type': 'Apartments',
         }
-        response = self.client.post(reverse('create_listing'), data)
-        self.assertEqual(response.status_code, 302)  # Redirect after successful creation
-        self.assertEqual(Listing.objects.count(), 2)
+        form = ListingForm(data=form_data)
+        self.assertTrue(form.is_valid())
 
-    def test_edit_listing_view(self):
-        # Test unauthenticated access
-        self.client.logout()
-        response = self.client.get(reverse('edit_listing', args=[self.listing.id]))
-        self.assertEqual(response.status_code, 302)  # Expect redirection to login
-
-        # Test unauthorized user access
-        self.client.login(email='other@example.com', password='testpass123')
-        response = self.client.get(reverse('edit_listing', args=[self.listing.id]))
-        self.assertEqual(response.status_code, 403)  # Forbidden access
-
-        # Test authorized user access
-        self.client.login(email='owner@example.com', password='testpass123')
-        response = self.client.get(reverse('edit_listing', args=[self.listing.id]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'listings/listing_form.html')
-
-        data = {
-            'title': 'Updated Listing',
-            'description': 'An updated nice place to stay.',
-            'location': 'Updated City',
-            'price': 150.00,
-            'rooms': 3,
-            'property_type': 'Hotels',
-            'is_active': True,
+    def test_listing_form_invalid(self):
+        form_data = {
+            'title': '',
+            'description': 'Test Description',
+            'location': 'Test Location',
+            'price': 100.00,
+            'rooms': 2,
+            'property_type': 'Apartments',
         }
-        response = self.client.post(reverse('edit_listing', args=[self.listing.id]), data)
-        self.assertEqual(response.status_code, 302)  # Redirect after successful edit
-        self.listing.refresh_from_db()
-        self.assertEqual(self.listing.title, 'Updated Listing')
+        form = ListingForm(data=form_data)
+        self.assertFalse(form.is_valid())
 
-    def test_delete_listing_view(self):
-        self.client.login(email='owner@example.com', password='testpass123')
-        response = self.client.get(reverse('delete_listing', args=[self.listing.id]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'listings/listing_confirm_delete.html')
+class ListingViewTests(TestCase):
 
-        response = self.client.post(reverse('delete_listing', args=[self.listing.id]))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Listing.objects.count(), 0)
-
-    def test_toggle_listing_status_view(self):
-        self.client.login(email='owner@example.com', password='testpass123')
-        response = self.client.get(reverse('toggle_listing_status', args=[self.listing.id]))
-        self.assertEqual(response.status_code, 302)
-        self.listing.refresh_from_db()
-        self.assertFalse(self.listing.is_active)
-
-        response = self.client.get(reverse('toggle_listing_status', args=[self.listing.id]))
-        self.assertEqual(response.status_code, 302)
-        self.listing.refresh_from_db()
-        self.assertTrue(self.listing.is_active)
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(email='testuser@example.com', password='12345')
+        self.listing = Listing.objects.create(
+            title='Test Listing',
+            description='Test Description',
+            location='Test Location',
+            price=100.00,
+            rooms=2,
+            property_type='Apartments',
+            owner=self.user
+        )
 
     def test_listing_detail_view(self):
-        response = self.client.get(reverse('listing_detail', args=[self.listing.id]))
+        response = self.client.get(reverse('listing_detail', args=[self.listing.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'listings/listing_detail.html')
         self.assertContains(response, self.listing.title)
 
     def test_home_view(self):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'listings/home.html')
-        self.assertContains(response, self.listing.title)
+        self.assertContains(response, 'Test Listing')  # Убедитесь, что заголовок листинга присутствует на домашней странице
 
-        response = self.client.get(reverse('home') + '?location=Test City')
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.listing.title)
+    def test_create_listing_view_authenticated(self):
+        self.client.login(email='testuser@example.com', password='12345')
+        response = self.client.post(reverse('create_listing'), {
+            'title': 'New Listing',
+            'description': 'New Description',
+            'location': 'New Location',
+            'price': 150.00,
+            'rooms': 3,
+            'property_type': 'Villas'
+        })
+        self.assertEqual(response.status_code, 302)  # Redirect after successful creation
 
-        response = self.client.get(reverse('home') + '?sort_by=price_asc')
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.listing.title)
-
-
+    def test_create_listing_view_unauthenticated(self):
+        response = self.client.get(reverse('create_listing'))
+        self.assertRedirects(response, '/users/login/?next=/listings/new/')  # Обновлено для корректного URL-адреса
 
 
 

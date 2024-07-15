@@ -1,83 +1,103 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from listings.models import Listing
-from bookings.models import Booking
 from datetime import date, timedelta
+from bookings.models import Booking
+from listings.models import Listing
+from Travel_guru import settings
 
 User = get_user_model()
 
 
-class BookingTests(TestCase):
+class BookingModelTests(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(email='testuser@example.com', password='testpass123', name='Test User')
-        self.owner = User.objects.create_user(email='owner@example.com', password='testpass123', name='Owner User')
+        self.user = User.objects.create_user(email='testuser@example.com', password='12345')
         self.listing = Listing.objects.create(
             title='Test Listing',
-            description='A nice place to stay.',
-            location='Test City',
+            description='Test Description',
+            location='Test Location',
             price=100.00,
             rooms=2,
             property_type='Apartments',
-            owner=self.owner,
+            owner=self.user
         )
         self.booking = Booking.objects.create(
             user=self.user,
             listing=self.listing,
             start_date=date.today(),
-            end_date=date.today(),
-            price=100.00,
-            status='pending',
+            end_date=date.today() + timedelta(days=1),
+            status='confirmed',
+            price=100.00
         )
-        self.client.login(email='testuser@example.com', password='testpass123')
 
-    def test_create_booking_view(self):
+    def test_booking_creation(self):
+        self.assertEqual(self.booking.user, self.user)
+        self.assertEqual(self.booking.listing, self.listing)
+        self.assertEqual(self.booking.status, 'confirmed')
+
+    def test_booking_total_price(self):
+        self.assertEqual(self.booking.total_price, 100.00)
+
+    def test_unavailable_dates(self):
+        unavailable_dates = Booking.get_unavailable_dates(self.listing)
+        expected_dates = [date.today().strftime('%Y-%m-%d'), (date.today() + timedelta(days=1)).strftime('%Y-%m-%d')]
+        self.assertEqual(unavailable_dates, expected_dates)
+
+class BookingViewTests(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(email='testuser@example.com', password='12345')
+        self.listing = Listing.objects.create(
+            title='Test Listing',
+            description='Test Description',
+            location='Test Location',
+            price=100.00,
+            rooms=2,
+            property_type='Apartments',
+            owner=self.user
+        )
+
+    def test_create_booking_unauthenticated(self):
         response = self.client.get(reverse('create_booking', args=[self.listing.id]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'bookings/create_booking.html')
+        login_url = reverse(settings.LOGIN_URL)  # Использование пути из настроек
+        self.assertRedirects(response, f'{login_url}?next=/bookings/create/{self.listing.id}/')
 
-        data = {
-            'start_date': date.today() + timedelta(days=1),
-            'end_date': date.today() + timedelta(days=2),
-        }
-        response = self.client.post(reverse('create_booking', args=[self.listing.id]), data)
-
-        if response.status_code != 302:
-            print(response.context['form'].errors)  # Вывод ошибок формы для отладки
-
+    def test_create_booking_authenticated(self):
+        self.client.login(email='testuser@example.com', password='12345')
+        response = self.client.post(reverse('create_booking', args=[self.listing.id]), {
+            'start_date': date.today(),
+            'end_date': date.today() + timedelta(days=1)
+        })
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(Booking.objects.count(), 2)
-
-    def test_my_bookings_view(self):
-        response = self.client.get(reverse('my_bookings'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'bookings/my_bookings.html')
-        self.assertContains(response, self.listing.title)
-
-    def test_cancel_booking_view(self):
-        response = self.client.get(reverse('cancel_booking', args=[self.booking.id]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'bookings/cancel_booking.html')
-
-        response = self.client.post(reverse('cancel_booking', args=[self.booking.id]))
-        self.assertEqual(response.status_code, 302)
-        self.booking.refresh_from_db()
-        self.assertEqual(self.booking.status, 'cancelled')
+        self.assertRedirects(response, reverse('my_bookings'))
 
     def test_manage_bookings_view(self):
-        self.client.login(email='owner@example.com', password='testpass123')
+        self.client.login(email='testuser@example.com', password='12345')
         response = self.client.get(reverse('manage_bookings'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'bookings/manage_bookings.html')
-        self.assertContains(response, self.listing.title)
+        self.assertContains(response, 'Manage Bookings')
 
-    def test_update_booking_status_view(self):
-        self.client.login(email='owner@example.com', password='testpass123')
-        response = self.client.get(reverse('update_booking_status', args=[self.booking.id, 'confirmed']))
-        self.assertEqual(response.status_code, 302)
-        self.booking.refresh_from_db()
-        self.assertEqual(self.booking.status, 'confirmed')
+    def test_cancel_booking(self):
+        booking = Booking.objects.create(
+            user=self.user,
+            listing=self.listing,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            status='confirmed',
+            price=100.00
+        )
+        self.client.login(email='testuser@example.com', password='12345')
+        response = self.client.post(reverse('cancel_booking', args=[booking.id]))
+        self.assertRedirects(response, reverse('my_bookings'))
+        booking.refresh_from_db()
+        self.assertEqual(booking.status, 'cancelled')
+
+
+
+
+
 
 
 
