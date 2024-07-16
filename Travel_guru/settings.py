@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'bootstrap_datepicker_plus',
+    'rest_framework',
 
     'listings',
     'auth_user',

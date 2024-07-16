@@ -10,9 +10,17 @@ from bookings.forms import BookingForm
 from bookings.models import Booking
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
+from rest_framework import viewsets
 from .forms import ListingForm, ListingImageFormSet
 from .models import Listing, ListingImage
 from .utils import get_listing_context
+from .models import Listing
+from .serializers import ListingSerializer
+
+
+class ListingViewSet(viewsets.ModelViewSet):
+    queryset = Listing.objects.all()
+    serializer_class = ListingSerializer
 
 
 def home(request):

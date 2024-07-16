@@ -25,6 +25,13 @@ urlpatterns = [
     path('listings/', include('listings.urls')),
     path('bookings/', include('bookings.urls')),
     path('reviews/', include('reviews.urls')),
+    path('api/', include('listings.api_urls')),
+    path('api/auth/', include('auth_user.api_urls')),
+    path('api/bookings/', include('bookings.api_urls')),
+    path('api/reviews/', include('reviews.api_urls')),
+    path('api/', include('rest_framework.urls', namespace='rest_framework')),
+    path('', include('listings.urls')),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

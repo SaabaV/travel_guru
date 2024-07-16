@@ -2,10 +2,18 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from listings.models import Listing
-from .models import Review
-from .forms import ReviewForm
 from listings.utils import get_listing_context
 from bookings.models import Booking
+from rest_framework import viewsets
+from .models import Review
+from .serializers import ReviewSerializer
+from .models import Review
+from .forms import ReviewForm
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
 
 
 def listing_detail(request, pk):

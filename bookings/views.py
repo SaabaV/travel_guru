@@ -6,11 +6,19 @@ from django.urls import reverse
 from django.conf import settings
 from listings.models import Listing
 from django.views.decorators.http import require_POST
-
+from rest_framework import viewsets
 from .models import Booking, Payment
 from .forms import BookingForm
+from .models import Booking
+from .serializers import BookingSerializer
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
 
 
 @login_required

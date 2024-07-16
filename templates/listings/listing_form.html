@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if form.instance.pk %}Edit{% else %}New{% endif %} Listing</title>
-    <link rel="stylesheet" href="{% static 'css/listing.css' %}">
+    <link rel="stylesheet" href="{% static 'css/listing_add.css' %}">
 </head>
 <body>
     <div class="container">
@@ -15,16 +15,36 @@
             {{ form.as_p }}
             <h2>Images</h2>
             {{ formset.management_form }}
-            {% for form in formset %}
-                {{ form.as_p }}
-            {% endfor %}
+            <div id="image-fields">
+                {% for form in formset %}
+                    <div class="image-field" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
+                        {{ form.as_p }}
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-more">Add More</button>
             <div class="form-actions">
                 <button type="submit">Save</button>
                 <button type="button" onclick="window.location.href='{% url 'home' %}'">Cancel</button>
             </div>
         </form>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addMoreButton = document.getElementById('add-more');
+            addMoreButton.addEventListener('click', function() {
+                const hiddenFields = document.querySelectorAll('.image-field[style="display: none;"]');
+                if (hiddenFields.length > 0) {
+                    hiddenFields[0].style.display = 'block';
+                }
+                if (hiddenFields.length === 1) {
+                    addMoreButton.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
+
 
 

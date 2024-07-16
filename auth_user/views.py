@@ -1,7 +1,15 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
-from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from django.views.decorators.csrf import csrf_protect
+from rest_framework import viewsets
+from .models import CustomUser
+from .serializers import UserSerializer
+from .forms import CustomUserCreationForm, CustomAuthenticationForm
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
 
 
 @csrf_protect
