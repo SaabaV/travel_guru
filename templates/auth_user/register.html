@@ -27,6 +27,14 @@
         <input type="password" id="id_password2" name="password2" placeholder="Confirm your password" required>
     </div>
 
+    <div class="form-group">
+        <label for="id_is_landlord">Account Type</label>
+        <select id="id_is_landlord" name="is_landlord" required>
+            <option value="False">Tenant</option>
+            <option value="True">Landlord</option>
+        </select>
+    </div>
+
     <button type="submit">Register</button>
     <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
 </form>
@@ -38,40 +46,33 @@
         const name = document.getElementById('id_name');
         const password1 = document.getElementById('id_password1');
         const password2 = document.getElementById('id_password2');
+        const accountType = document.getElementById('id_is_landlord');
 
         if (email.value.trim() === '') {
             valid = false;
-            document.getElementById('email-error').style.display = 'block';
             email.classList.add('error');
         } else {
-            document.getElementById('email-error').style.display = 'none';
             email.classList.remove('error');
         }
 
         if (name.value.trim() === '') {
             valid = false;
-            document.getElementById('name-error').style.display = 'block';
             name.classList.add('error');
         } else {
-            document.getElementById('name-error').style.display = 'none';
             name.classList.remove('error');
         }
 
         if (password1.value.trim() === '') {
             valid = false;
-            document.getElementById('password1-error').style.display = 'block';
             password1.classList.add('error');
         } else {
-            document.getElementById('password1-error').style.display = 'none';
             password1.classList.remove('error');
         }
 
         if (password2.value.trim() === '') {
             valid = false;
-            document.getElementById('password2-error').style.display = 'block';
             password2.classList.add('error');
         } else {
-            document.getElementById('password2-error').style.display = 'none';
             password2.classList.remove('error');
         }
 
@@ -81,6 +82,8 @@
     });
 </script>
 {% endblock %}
+
+
 
 
 

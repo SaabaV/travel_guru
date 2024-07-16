@@ -60,8 +60,7 @@ def home(request):
     else:
         listings = listings.annotate(avg_rating=Avg('reviews__rating'))
 
-    # Сортировка по умолчанию
-    listings = listings.order_by('-created_at')
+    listings = listings.annotate(avg_rating=Avg('reviews__rating'))
 
     # Пагинация
     paginator = Paginator(listings, 10)  # 10 объявлений на страницу
