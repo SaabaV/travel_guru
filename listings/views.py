@@ -174,7 +174,7 @@ def update_booking_status(request, booking_id, status):
             send_mail(
                 'Booking status updated',
                 f'Your booking status has been updated to {status}.',
-                'from@example.com',
+                'Travel@guru',
                 [booking.user.email],
                 fail_silently=False,
             )

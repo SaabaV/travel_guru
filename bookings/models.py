@@ -22,6 +22,11 @@ class Booking(models.Model):
     def __str__(self):
         return f'Booking {self.id} by {self.user} for {self.listing}'
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.status in ['pending', 'confirmed']:
+            self.listing.block_dates(self.start_date, self.end_date)
+
     @staticmethod
     def get_unavailable_dates(listing):
         bookings = Booking.objects.filter(listing=listing, status='confirmed')

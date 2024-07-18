@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.db.models import Avg
+from datetime import timedelta
 
 
 class Listing(models.Model):
@@ -26,6 +27,16 @@ class Listing(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     average_rating = models.FloatField(default=0, blank=True)
     reviews_count = models.IntegerField(default=0)
+    blocked_dates = models.JSONField(default=list, blank=True)
+
+    def block_dates(self, start_date, end_date):
+        new_blocked_dates = set(self.blocked_dates)
+        current_date = start_date
+        while current_date <= end_date:
+            new_blocked_dates.add(current_date.isoformat())
+            current_date += timedelta(days=1)
+        self.blocked_dates = list(new_blocked_dates)
+        self.save()
 
     def update_avg_rating(self):
         reviews = self.reviews.filter(approved=True)

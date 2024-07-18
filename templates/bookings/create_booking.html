@@ -9,12 +9,15 @@
     <link rel="stylesheet" href="{% static 'bootstrap_datepicker_plus/css/datepicker-widget.css' %}">
 </head>
 <body>
-    <h1>Book {{ listing.title }}</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Book Now</button>
-    </form>
+    <div class="container">
+        <h1>Book {{ listing.title }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Book Now</button>
+        </form>
+    </div>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'bootstrap_datepicker_plus/js/datepicker-widget.js' %}"></script>
     <script>
@@ -25,14 +28,27 @@
                 beforeShowDay: function (date) {
                     var formattedDate = date.toISOString().split('T')[0];
                     if (unavailableDates.includes(formattedDate)) {
-                        return false;
+                        return {
+                            enabled: false,
+                            classes: 'blocked',
+                            tooltip: 'Unavailable'
+                        };
                     }
                     return true;
                 }
             });
         });
     </script>
+    <style>
+        .blocked {
+            background-color: #ffcccc !important;
+            color: #555 !important;
+            pointer-events: none;
+        }
+    </style>
 </body>
 </html>
+
+
 
 

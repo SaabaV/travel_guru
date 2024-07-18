@@ -100,7 +100,3 @@ class CustomUserTests(TestCase):
         }
         form = AuthenticationForm(data=form_data)
         self.assertTrue(form.is_valid())
-
-
-
-

@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.home, name='home'),  # Маршрут для домашней страницы
+    path('', views.home, name='home'),
     path('new/', views.create_listing, name='create_listing'),
     path('<int:pk>/edit/', views.edit_listing, name='edit_listing'),
     path('<int:pk>/delete/', views.delete_listing, name='delete_listing'),
