@@ -22,7 +22,7 @@ h1 {
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
-    margin-top: 20px; /* Добавлено для отступа сверху */
+    margin-top: 20px;
 }
 
 .button {

@@ -39,22 +39,22 @@
         }
 
         .status-pending {
-            color: #FFA500; /* Желтый цвет */
+            color: #FFA500;
             font-weight: bold;
         }
 
         .status-confirmed {
-            color: #4CAF50; /* Зеленый цвет */
+            color: #4CAF50;
             font-weight: bold;
         }
 
         .status-declined {
-            color: #FF0000; /* Красный цвет */
+            color: #FF0000;
             font-weight: bold;
         }
 
         .status-completed {
-            color: #0000FF; /* Синий цвет */
+            color: #0000FF;
             font-weight: bold;
         }
 

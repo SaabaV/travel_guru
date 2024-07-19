@@ -52,7 +52,6 @@ def home(request):
             Q(title__icontains=search_query) | Q(description__icontains=search_query)
         )
 
-    # Сортировка
     if sort_by == 'price_asc':
         listings = listings.order_by('price')
     elif sort_by == 'price_desc':
@@ -70,8 +69,7 @@ def home(request):
 
     listings = listings.annotate(avg_rating=Avg('reviews__rating'))
 
-    # Пагинация
-    paginator = Paginator(listings, 10)  # 10 объявлений на страницу
+    paginator = Paginator(listings, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
